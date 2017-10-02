@@ -295,6 +295,20 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         mComputerMediaPlayer.release();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putCharArray("board", mGame.getBoardState());
+        outState.putBoolean("mGameOver", mGameOver);
+        outState.putInt("mHumanWins", mHumanGamesWon);
+        outState.putInt("mComputerWins", mAndroidGamesWon);
+        outState.putInt("mTies", mTiesGames);
+        outState.putCharSequence("info", mInfoTextView.getText());
+        outState.putBoolean("mGoFirst", mHumanWasFirst);
+    }
+
+
 
 
 }
