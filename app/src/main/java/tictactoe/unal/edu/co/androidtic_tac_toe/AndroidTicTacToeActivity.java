@@ -2,6 +2,7 @@ package tictactoe.unal.edu.co.androidtic_tac_toe;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -38,7 +39,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
     static final int DIALOG_QUIT_ID = 1;
     MediaPlayer mHumanMediaPlayer;
     MediaPlayer mComputerMediaPlayer;
-
+    private SharedPreferences mPrefs;
 
 
     @Override
@@ -53,12 +54,36 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         mHumanTextView = (TextView) findViewById(R.id.tvHuman);
         mTiesTextView = (TextView) findViewById(R.id.tvTies);
         mAndroidTextView = (TextView) findViewById(R.id.tvAndroid);
+        mPrefs = getSharedPreferences("ttt_prefs", MODE_PRIVATE);
+        // Restore the scores
+        mHumanGamesWon = mPrefs.getInt("mHumanWins", 0);
+        mAndroidGamesWon = mPrefs.getInt("mComputerWins", 0);
+        mTiesGames = mPrefs.getInt("mTies", 0);
 
-        mTiesGames = 0;
+        if (savedInstanceState == null) {
+            startNewGame();
+        } else {
+            // Restore the game's state
+            mGame.setBoardState(savedInstanceState.getCharArray("board"));
+            mGameOver = savedInstanceState.getBoolean("mGameOver");
+            mInfoTextView.setText(savedInstanceState.getCharSequence("info"));
+            mHumanGamesWon = savedInstanceState.getInt("mHumanWins");
+            mAndroidGamesWon = savedInstanceState.getInt("mComputerWins");
+            mTiesGames = savedInstanceState.getInt("mTies");
+            mHumanWasFirst = savedInstanceState.getBoolean("mGoFirst");
+        }
+        updateBoard();
+        /*mTiesGames = 0;
         mHumanGamesWon = 0;
         mAndroidGamesWon = 0;
-        updateBoard();
-        startNewGame();
+
+        startNewGame();*/
+    }
+
+    private void updateBoard() {
+        mAndroidTextView.setText(String.valueOf(mAndroidGamesWon));
+        mHumanTextView.setText(String.valueOf(mHumanGamesWon));
+        mTiesTextView.setText(String.valueOf(mTiesGames));
     }
 
     private void startNewGame() {
@@ -90,42 +115,36 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
 
         public void onClick(View view) {
             //if (mBoardButtons[location].isEnabled() && !mGameOver) {
-                setMove(TicTacToeGame.HUMAN_PLAYER, location);
-                // If no winner yet, let the computer make a move
-                int winner = mGame.checkForWinner();
-                if (winner == 0) {
-                    mInfoTextView.setText(R.string.turn_computer);
-                    int move = mGame.getComputerMove();
-                    setMove(TicTacToeGame.COMPUTER_PLAYER, move);
-                    winner = mGame.checkForWinner();
-                }
-                if (winner == 0)
-                    mInfoTextView.setText(R.string.turn_human);
-                else if (winner == 1) {
-                    mGameOver = true;
-                    mInfoTextView.setText(R.string.result_tie);
-                    mTiesGames++;
-                    updateBoard();
-                } else if (winner == 2) {
-                    mGameOver = true;
-                    mInfoTextView.setText(R.string.result_human_wins);
-                    mHumanGamesWon++;
-                    updateBoard();
-                } else {
-                    mGameOver = true;
-                    mInfoTextView.setText(R.string.result_computer_wins);
-                    mAndroidGamesWon++;
-                    updateBoard();
-                }
+            setMove(TicTacToeGame.HUMAN_PLAYER, location);
+            // If no winner yet, let the computer make a move
+            int winner = mGame.checkForWinner();
+            if (winner == 0) {
+                mInfoTextView.setText(R.string.turn_computer);
+                int move = mGame.getComputerMove();
+                setMove(TicTacToeGame.COMPUTER_PLAYER, move);
+                winner = mGame.checkForWinner();
+            }
+            if (winner == 0)
+                mInfoTextView.setText(R.string.turn_human);
+            else if (winner == 1) {
+                mGameOver = true;
+                mInfoTextView.setText(R.string.result_tie);
+                mTiesGames++;
+                updateBoard();
+            } else if (winner == 2) {
+                mGameOver = true;
+                mInfoTextView.setText(R.string.result_human_wins);
+                mHumanGamesWon++;
+                updateBoard();
+            } else {
+                mGameOver = true;
+                mInfoTextView.setText(R.string.result_computer_wins);
+                mAndroidGamesWon++;
+                updateBoard();
+            }
 
             //}
         }
-    }
-
-    private void updateBoard() {
-        mAndroidTextView.setText(String.valueOf(mAndroidGamesWon));
-        mHumanTextView.setText(String.valueOf(mHumanGamesWon));
-        mTiesTextView.setText(String.valueOf(mTiesGames));
     }
 
 
@@ -161,7 +180,12 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                 showDialog(DIALOG_DIFFICULTY_ID);
                 return true;
             case R.id.quit:
-                showDialog(DIALOG_QUIT_ID);
+                mHumanGamesWon = 0;
+                mAndroidGamesWon = 0;
+                mTiesGames = 0;
+                updateBoard();
+                startNewGame();
+                //showDialog(DIALOG_QUIT_ID);
                 return true;
         }
         return false;
@@ -244,7 +268,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
             int row = (int) event.getY() / mBoardView.getBoardCellHeight();
             int pos = row * 3 + col;
 
-            if (!mGameOver && setMove(TicTacToeGame.HUMAN_PLAYER, pos))	{
+            if (!mGameOver && setMove(TicTacToeGame.HUMAN_PLAYER, pos)) {
 
                 // If no winner yet, let the computer make a move
                 int winner = mGame.checkForWinner();
@@ -309,6 +333,17 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Save the current scores
+        SharedPreferences.Editor ed = mPrefs.edit();
+        ed.putInt("mHumanWins", mHumanGamesWon);
+        ed.putInt("mComputerWins", mAndroidGamesWon);
+        ed.putInt("mTies", mTiesGames);
+        ed.commit();
+    }
 
 
 }

@@ -11,7 +11,7 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_fitness_center_black_24px"  />
     <item android:id="@+id/quit"
-        android:title="@string/quit"
+        android:title="@string/reset_scores"
         app:showAsAction="always"
         android:icon="@drawable/ic_close_black_24px" />
 

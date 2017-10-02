@@ -27,6 +27,10 @@ public class TicTacToeGame {
         return mBoard;
     }
 
+    public void setBoardState(char[] boardState) {
+        this.mBoard = boardState;
+    }
+
     // The computer's difficulty levels
     public enum DifficultyLevel {
         Easy, Harder, Expert
