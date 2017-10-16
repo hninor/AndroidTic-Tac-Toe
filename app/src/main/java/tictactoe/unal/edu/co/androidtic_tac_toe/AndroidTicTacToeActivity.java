@@ -116,47 +116,6 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
 
     }
 
-    private class ButtonClickListener implements View.OnClickListener {
-        int location;
-
-        public ButtonClickListener(int location) {
-            this.location = location;
-        }
-
-        public void onClick(View view) {
-            //if (mBoardButtons[location].isEnabled() && !mGameOver) {
-            setMove(TicTacToeGame.HUMAN_PLAYER, location);
-            // If no winner yet, let the computer make a move
-            int winner = mGame.checkForWinner();
-            if (winner == 0) {
-                mInfoTextView.setText(R.string.turn_computer);
-                int move = mGame.getComputerMove();
-                setMove(TicTacToeGame.COMPUTER_PLAYER, move);
-                winner = mGame.checkForWinner();
-            }
-            if (winner == 0)
-                mInfoTextView.setText(R.string.turn_human);
-            else if (winner == 1) {
-                mGameOver = true;
-                mInfoTextView.setText(R.string.result_tie);
-                mTiesGames++;
-                updateBoard();
-            } else if (winner == 2) {
-                mGameOver = true;
-                String defaultMessage = getResources().getString(R.string.result_human_wins);
-                mInfoTextView.setText(mPrefs.getString("victory_message", defaultMessage));
-                mHumanGamesWon++;
-                updateBoard();
-            } else {
-                mGameOver = true;
-                mInfoTextView.setText(R.string.result_computer_wins);
-                mAndroidGamesWon++;
-                updateBoard();
-            }
-
-            //}
-        }
-    }
 
 
     private boolean setMove(char player, int location) {
@@ -324,7 +283,8 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                     updateBoard();
                 } else if (winner == 2) {
                     mGameOver = true;
-                    mInfoTextView.setText(R.string.result_human_wins);
+                    String defaultMessage = getResources().getString(R.string.result_human_wins);
+                    mInfoTextView.setText(mPrefs.getString("victory_message", defaultMessage));
                     mHumanGamesWon++;
                     updateBoard();
                 } else {
