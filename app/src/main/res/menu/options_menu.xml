@@ -15,5 +15,10 @@
         app:showAsAction="always"
         android:icon="@drawable/ic_close_black_24px" />
 
+    <item android:id="@+id/online"
+        android:title="@string/online"
+        app:showAsAction="never"
+         />
+
 
 </menu>

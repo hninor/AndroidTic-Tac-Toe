@@ -28,10 +28,16 @@
         <service
             android:name=".services.FirebaseIDService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true" />
 
-
-        </service>
+        <activity
+            android:name=".online.CreateGameActivity"
+            android:label="@string/title_activity_create_gamme"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".online.JoinGameActivity"
+            android:label="@string/title_activity_join_game"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

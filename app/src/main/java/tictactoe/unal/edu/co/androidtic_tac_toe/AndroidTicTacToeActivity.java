@@ -4,19 +4,17 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.util.StringBuilderPrinter;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +23,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import tictactoe.unal.edu.co.androidtic_tac_toe.online.CreateGameActivity;
+import tictactoe.unal.edu.co.androidtic_tac_toe.online.JoinGameActivity;
 
 public class AndroidTicTacToeActivity extends AppCompatActivity {
 
@@ -97,9 +98,8 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
 
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-
-        myRef.setValue("Hello, World!");
+        DatabaseReference myRef = database.getReference("tablero");
+        //myRef.setValue(new String(mGame.getBoardState()));
 
         // Read from the database
         myRef.addValueEventListener(new ValueEventListener() {
@@ -108,8 +108,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 String value = dataSnapshot.getValue(String.class);
-                Toast.makeText(AndroidTicTacToeActivity.this, "Cambio dato", Toast.LENGTH_SHORT).show();
-                //Log.d(TAG, "Value is: " + value);
+                //mGame.setBoardState(value.toCharArray());
             }
 
             @Override
@@ -189,6 +188,10 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                 updateBoard();
                 startNewGame();
                 //showDialog(DIALOG_QUIT_ID);
+                return true;
+
+            case R.id.online:
+                startActivity(new Intent(this, JoinGameActivity.class));
                 return true;
         }
         return false;
