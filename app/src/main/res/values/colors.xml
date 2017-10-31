@@ -6,4 +6,5 @@
 
     <color name="selected_item_color">#26000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="colorFloatingButton">#00838f</color>
 </resources>

@@ -2,7 +2,7 @@
     <string name="app_name">Tic-Tac-Toe</string>
     <string name="first_human">You go first.</string>
     <string name="first_android">Android go first.</string>
-    <string name="turn_human">Your turn.</string>
+    <string name="turn_human">Opponent turn!</string>
     <string name="turn_computer">Android\'s turn.</string>
     <string name="result_tie">It\'s a tie.</string>
     <string name="result_human_wins">You won!</string>
@@ -94,11 +94,13 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_vibrate">Vibrate</string>
-    <string name="title_activity_create_gamme">CreateGammeActivity</string>
+    <string name="title_activity_create_gamme">Create Game</string>
     <string name="nombre_sala">Nombre Sala</string>
     <string name="nombre_usuario">Usuario</string>
     <string name="online">Online Game</string>
     <string name="complete_informacion">Complete la infomación</string>
     <string name="juego_creado">Juego creado</string>
-    <string name="title_activity_join_game">JoinGameActivity</string>
+    <string name="title_activity_join_game">Join A Game</string>
+    <string name="title_activity_tic_tac">Tic-Tac-Toe Online</string>
+    <string name="esperando_jugadores">Esperando jugadores</string>
 </resources>

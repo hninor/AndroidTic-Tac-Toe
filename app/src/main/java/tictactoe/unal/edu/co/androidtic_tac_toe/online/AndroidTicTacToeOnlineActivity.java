@@ -1,4 +1,4 @@
-package tictactoe.unal.edu.co.androidtic_tac_toe;
+package tictactoe.unal.edu.co.androidtic_tac_toe.online;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.StringBuilderPrinter;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,12 +24,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import tictactoe.unal.edu.co.androidtic_tac_toe.online.CreateGameActivity;
-import tictactoe.unal.edu.co.androidtic_tac_toe.online.JoinGameActivity;
+import tictactoe.unal.edu.co.androidtic_tac_toe.BoardView;
+import tictactoe.unal.edu.co.androidtic_tac_toe.R;
+import tictactoe.unal.edu.co.androidtic_tac_toe.SettingsActivity;
+import tictactoe.unal.edu.co.androidtic_tac_toe.TicTacToeGame;
+import tictactoe.unal.edu.co.androidtic_tac_toe.online.business.RoomBusiness;
 
-public class AndroidTicTacToeActivity extends AppCompatActivity {
+public class AndroidTicTacToeOnlineActivity extends AppCompatActivity {
 
 
+    private static final String TAG = "ONLINE_GAME";
     // Represents the internal state of the game
     private TicTacToeGame mGame;
     private boolean mGameOver;
@@ -96,6 +100,28 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
         }
         updateBoard();
 
+        // Write a message to the database
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("tablero");
+        //myRef.setValue(new String(mGame.getBoardState()));
+
+        // Read from the database
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                String value = dataSnapshot.getValue(String.class);
+                //mGame.setBoardState(value.toCharArray());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                //Log.w(TAG, "Failed to read value.", error.toException());
+            }
+        });
+
     }
 
     private void updateBoard() {
@@ -146,7 +172,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
+        inflater.inflate(R.menu.options_menu_online, menu);
         return true;
     }
 
@@ -168,9 +194,6 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                 //showDialog(DIALOG_QUIT_ID);
                 return true;
 
-            case R.id.online:
-                startActivity(new Intent(this, JoinGameActivity.class));
-                return true;
         }
         return false;
 
@@ -230,7 +253,7 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
                         .setCancelable(false)
                         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                AndroidTicTacToeActivity.this.finish();
+                                AndroidTicTacToeOnlineActivity.this.finish();
                             }
                         })
                         .setNegativeButton(R.string.no, null);
@@ -276,41 +299,65 @@ public class AndroidTicTacToeActivity extends AppCompatActivity {
             int row = (int) event.getY() / mBoardView.getBoardCellHeight();
             int pos = row * 3 + col;
 
-            if (!mGameOver && setMove(TicTacToeGame.HUMAN_PLAYER, pos)) {
+            final DatabaseReference mDatabaseReference = FirebaseDatabase.getInstance().getReference(RoomBusiness.GAME_REFERENCE);
 
+            ValueEventListener postListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    int move = dataSnapshot.getValue(Integer.class);
+                    setMove(TicTacToeGame.COMPUTER_PLAYER, move);
+                    int winner = mGame.checkForWinner();
+                    checkForWinner(winner);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting Post failed, log a message
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                    // ...
+                }
+            };
+            mDatabaseReference.addValueEventListener(postListener);
+
+            if (!mGameOver && setMove(TicTacToeGame.HUMAN_PLAYER, pos)) {
+                mDatabaseReference.setValue(pos);
                 // If no winner yet, let the computer make a move
                 int winner = mGame.checkForWinner();
-                if (winner == 0) {
-                    mInfoTextView.setText(R.string.turn_computer);
-                    int move = mGame.getComputerMove();
-                    setMove(TicTacToeGame.COMPUTER_PLAYER, move);
-                    winner = mGame.checkForWinner();
-                }
-                if (winner == 0)
-                    mInfoTextView.setText(R.string.turn_human);
-                else if (winner == 1) {
-                    mGameOver = true;
-                    mInfoTextView.setText(R.string.result_tie);
-                    mTiesGames++;
-                    updateBoard();
-                } else if (winner == 2) {
-                    mGameOver = true;
-                    String defaultMessage = getResources().getString(R.string.result_human_wins);
-                    mInfoTextView.setText(mPrefs.getString("victory_message", defaultMessage));
-                    mHumanGamesWon++;
-                    updateBoard();
-                } else {
-                    mGameOver = true;
-                    mInfoTextView.setText(R.string.result_computer_wins);
-                    mAndroidGamesWon++;
-                    updateBoard();
-                }
+                checkForWinner(winner);
+
+
             }
 
             // So we aren't notified of continued events when finger is moved
             return false;
         }
     };
+
+    private void checkForWinner(int winner) {
+
+        if (winner == 0)
+            mInfoTextView.setText(R.string.turn_human);
+        else if (winner == 1) {
+            mGameOver = true;
+            mInfoTextView.setText(R.string.result_tie);
+            mTiesGames++;
+            updateBoard();
+        } else if (winner == 2) {
+            mGameOver = true;
+            String defaultMessage = getResources().getString(R.string.result_human_wins);
+            mInfoTextView.setText(mPrefs.getString("victory_message", defaultMessage));
+            mHumanGamesWon++;
+            updateBoard();
+        } else {
+            mGameOver = true;
+            mInfoTextView.setText(R.string.result_computer_wins);
+            mAndroidGamesWon++;
+            updateBoard();
+        }
+    }
+
+
+
 
     @Override
     protected void onResume() {

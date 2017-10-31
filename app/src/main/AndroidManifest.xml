@@ -38,6 +38,11 @@
             android:name=".online.JoinGameActivity"
             android:label="@string/title_activity_join_game"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <activity
+            android:name=".online.AndroidTicTacToeOnlineActivity"
+            android:label="@string/title_activity_tic_tac"
+            ></activity>
     </application>
 
 </manifest>

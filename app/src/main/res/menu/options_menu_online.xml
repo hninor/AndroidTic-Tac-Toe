@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/new_game"
+        android:title="@string/new_game"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_add_circle_black_24px" />
+    <item android:id="@+id/settings"
+        android:title="@string/title_activity_settings"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_settings_black_24px"  />
+    <item android:id="@+id/quit"
+        android:title="@string/reset_scores"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_close_black_24px" />
+
+
+
+</menu>

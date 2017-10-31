@@ -20,45 +20,34 @@ import tictactoe.unal.edu.co.androidtic_tac_toe.online.entities.Room;
 
 public class RoomBusiness {
 
+    public static final String ROOM_REFERENCE = "rooms";
+    public static final String GAME_REFERENCE = "games";
     private DatabaseReference mDatabase;
 
+
     public RoomBusiness() {
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("rooms");
+        mDatabase = FirebaseDatabase.getInstance().getReference(ROOM_REFERENCE);
     }
 
-    public void writeNewRoom(String name, String player1) {
-        String key = mDatabase.child("rooms").push().getKey();
-        writeNewRoom(key, name, player1);
+    public String writeNewRoom(String name, String player1, boolean activo) {
+        String key = mDatabase.push().getKey();
+        writeNewRoom(key, name, player1, activo);
+        return key;
     }
 
-    public void writeNewRoom(String roomId, String name, String player1) {
-        Room user = new Room(name, player1);
-        mDatabase.child("rooms").child(roomId).setValue(user);
+    public void writeNewRoom(String roomId, String name, String player1, boolean activo) {
+        Room user = new Room(name, player1, activo);
+        mDatabase.child(roomId).setValue(user);
     }
 
-    public List<Room> readAllRooms() {
-        final List<Room> rooms = new ArrayList<>();
-        mDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                    // TODO: handle the post
-                }
-
-                //rooms.add(room);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                // ...
-            }
-        });
-        return rooms;
+    public void removeRoom(String roomId) {
+        mDatabase.child(roomId).removeValue();
     }
+
 
     public DatabaseReference getmDatabase() {
         return mDatabase;
     }
+
+
 }

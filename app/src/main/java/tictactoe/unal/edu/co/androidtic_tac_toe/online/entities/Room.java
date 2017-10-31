@@ -6,9 +6,10 @@ package tictactoe.unal.edu.co.androidtic_tac_toe.online.entities;
 
 public class Room {
 
-    public String name;
-    public String firstPlayer;
-    public String secondPlayer;
+    private String name;
+    private String firstPlayer;
+    private String secondPlayer;
+    private boolean activo;
 
     public Room() {
     }
@@ -16,6 +17,12 @@ public class Room {
     public Room(String name, String firstPlayer) {
         this.name = name;
         this.firstPlayer = firstPlayer;
+    }
+
+    public Room(String name, String firstPlayer, boolean activo) {
+        this.name = name;
+        this.firstPlayer = firstPlayer;
+        this.activo = activo;
     }
 
     public String getName() {
@@ -40,5 +47,14 @@ public class Room {
 
     public void setSecondPlayer(String secondPlayer) {
         this.secondPlayer = secondPlayer;
+    }
+
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

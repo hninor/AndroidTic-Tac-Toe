@@ -18,8 +18,22 @@ import tictactoe.unal.edu.co.androidtic_tac_toe.online.entities.Room;
  * Created by hnino on 30/10/2017.
  */
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> implements View.OnClickListener {
     private List<Room> mDataset;
+    private View.OnClickListener listener;
+
+
+
+    public void setOnClickListener(View.OnClickListener listener) {
+        this.listener = listener;
+    }
+
+
+    @Override
+    public void onClick(View view) {
+        if(listener != null)
+            listener.onClick(view);
+    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -49,6 +63,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                                                    int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_room_list, parent, false);
+        v.setOnClickListener(this);
         ViewHolder vh = new ViewHolder(v);
         return vh;
     }
@@ -58,8 +73,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.tvRoomName.setText(mDataset.get(position).getName());
-        holder.tvFirstPlayer.setText(mDataset.get(position).getFirstPlayer());
+        holder.tvRoomName.setText("Sala: " + mDataset.get(position).getName());
+        holder.tvFirstPlayer.setText("Jugador: " + mDataset.get(position).getFirstPlayer());
 
     }
 
