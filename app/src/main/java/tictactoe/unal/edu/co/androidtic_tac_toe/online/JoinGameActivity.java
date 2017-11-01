@@ -27,6 +27,9 @@ import tictactoe.unal.edu.co.androidtic_tac_toe.R;
 import tictactoe.unal.edu.co.androidtic_tac_toe.online.business.RoomBusiness;
 import tictactoe.unal.edu.co.androidtic_tac_toe.online.entities.Room;
 
+import static tictactoe.unal.edu.co.androidtic_tac_toe.online.business.GameBusiness.GAME_KEY_REFERENCE;
+import static tictactoe.unal.edu.co.androidtic_tac_toe.online.business.RoomBusiness.GO_FIRST;
+
 public class JoinGameActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
@@ -36,6 +39,7 @@ public class JoinGameActivity extends AppCompatActivity {
     private List<String> mKeyList = new ArrayList<>();
     private int mSelectedPosition;
     private RoomBusiness mRoomBusiness;
+    private ValueEventListener mValueEventListener;
 
 
     @Override
@@ -81,11 +85,16 @@ public class JoinGameActivity extends AppCompatActivity {
                 "Si",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-
-                        mRoomBusiness.getmDatabase().child(mKeyList.get(mSelectedPosition)).child("secondPlayer").setValue("Anonymous");
-                        mRoomBusiness.getmDatabase().child(mKeyList.get(mSelectedPosition)).child("activo").setValue(false);
+                        String key = mKeyList.get(mSelectedPosition);
+                        mRoomBusiness.getmDatabase().child(key).child("secondPlayer").setValue("Anonymous");
+                        mRoomBusiness.getmDatabase().child(key).child("activo").setValue(false);
+                        mRoomBusiness.getmDatabase().child(key).child("lastMovement").setValue(-1);
+                        mRoomBusiness.getmDatabase().removeEventListener(mValueEventListener);
                         Intent intent = new Intent(JoinGameActivity.this, AndroidTicTacToeOnlineActivity.class);
+                        intent.putExtra(GAME_KEY_REFERENCE, key);
+                        intent.putExtra(GO_FIRST, false);
                         startActivity(intent);
+                        finish();
                     }
                 });
 
@@ -103,7 +112,7 @@ public class JoinGameActivity extends AppCompatActivity {
 
     public void readAllRooms() {
 
-        mRoomBusiness.getmDatabase().addValueEventListener(new ValueEventListener() {
+        mValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 roomList.clear();
@@ -139,7 +148,9 @@ public class JoinGameActivity extends AppCompatActivity {
                 // Getting Post failed, log a message
                 // ...
             }
-        });
+        };
+
+        mRoomBusiness.getmDatabase().addValueEventListener(mValueEventListener);
 
     }
 

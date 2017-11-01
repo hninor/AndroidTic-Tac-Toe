@@ -10,6 +10,7 @@ public class Room {
     private String firstPlayer;
     private String secondPlayer;
     private boolean activo;
+    private int lastMovement;
 
     public Room() {
     }
@@ -56,5 +57,13 @@ public class Room {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public int getLastMovement() {
+        return lastMovement;
+    }
+
+    public void setLastMovement(int lastMovement) {
+        this.lastMovement = lastMovement;
     }
 }

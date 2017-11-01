@@ -66,12 +66,16 @@ public class TicTacToeGame {
      * @param location - The location (0-8) to place the move
      */
     public boolean setMove(char player, int location) {
-        if (mBoard[location] == OPEN_SPOT) {
-            mBoard[location] = player;
-            return true;
-        } else {
-            return false;
+        if (location >= 0 && location <= 8) {
+            if (mBoard[location] == OPEN_SPOT) {
+                mBoard[location] = player;
+                return true;
+            } else {
+                return false;
+            }
         }
+        return false;
+
     }
 
     /**

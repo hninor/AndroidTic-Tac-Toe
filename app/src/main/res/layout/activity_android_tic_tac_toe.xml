@@ -32,6 +32,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvFirstPlayerHuman"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/human"
@@ -74,6 +75,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:id="@+id/tvSecondPlayer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/android"

@@ -20,6 +20,9 @@ import tictactoe.unal.edu.co.androidtic_tac_toe.R;
 import tictactoe.unal.edu.co.androidtic_tac_toe.online.business.RoomBusiness;
 import tictactoe.unal.edu.co.androidtic_tac_toe.online.entities.Room;
 
+import static tictactoe.unal.edu.co.androidtic_tac_toe.online.business.GameBusiness.GAME_KEY_REFERENCE;
+import static tictactoe.unal.edu.co.androidtic_tac_toe.online.business.RoomBusiness.GO_FIRST;
+
 public class CreateGameActivity extends AppCompatActivity {
 
 
@@ -28,6 +31,7 @@ public class CreateGameActivity extends AppCompatActivity {
     private String mKeyRoom;
     private ProgressDialog mProgressDialog;
     private RoomBusiness mRoomBusiness;
+    private ValueEventListener mValueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,15 +75,18 @@ public class CreateGameActivity extends AppCompatActivity {
 
 
     public void listenJoinPlayer() {
-
-        mRoomBusiness.getmDatabase().child(mKeyRoom).addValueEventListener(new ValueEventListener() {
+        mValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Room room = dataSnapshot.getValue(Room.class);
                 if (room.getSecondPlayer() != null && !room.getSecondPlayer().isEmpty()) {
                     mProgressDialog.dismiss();
+                    mRoomBusiness.getmDatabase().child(mKeyRoom).removeEventListener(mValueEventListener);
                     Intent intent = new Intent(CreateGameActivity.this, AndroidTicTacToeOnlineActivity.class);
+                    intent.putExtra(GO_FIRST, true);
+                    intent.putExtra(GAME_KEY_REFERENCE, mKeyRoom);
                     startActivity(intent);
+                    finish();
                 }
             }
 
@@ -87,7 +94,8 @@ public class CreateGameActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
+        mRoomBusiness.getmDatabase().child(mKeyRoom).addValueEventListener(mValueEventListener);
 
     }
 

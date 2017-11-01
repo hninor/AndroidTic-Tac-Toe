@@ -21,7 +21,8 @@ import tictactoe.unal.edu.co.androidtic_tac_toe.online.entities.Room;
 public class RoomBusiness {
 
     public static final String ROOM_REFERENCE = "rooms";
-    public static final String GAME_REFERENCE = "games";
+    public static final String GO_FIRST = "goFirst";
+    //public static final String GAME_REFERENCE = "games";
     private DatabaseReference mDatabase;
 
 
